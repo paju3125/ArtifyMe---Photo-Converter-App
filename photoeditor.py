@@ -62,6 +62,7 @@ eye_cascade = cv2.CascadeClassifier('haarcascade_eye.xml')
 
 # Load image
 image = Image.open('logo13.png')
+img_width = 350
 
 # Create two columns with different width
 col1, col2 = st.columns([0.8, 0.2])
@@ -110,7 +111,7 @@ if uploaded_file is not None:
     col1, col2 = st.columns([0.5, 0.5])
     with col1:
         st.markdown('<p style="text-align: center;">Before</p>', unsafe_allow_html=True)
-        st.image(image, width=300)
+        st.image(image, width=img_width)
     with col2:
         st.markdown('<p style="text-align: center;">After</p>', unsafe_allow_html=True)
         filter = st.sidebar.radio('Edit your photo:', ['Original', 'Gray Image', 'Black and White', 'Pencil Sketch', 'Blur Effect', 'Rotate', 'Flip', 'Resize', 'Crop','Edge Detection', 'Brightness', 'Contrast', 'Saturation', 'Face Detection and Recognition', 'Text and Sticker Overlay', 'Automatic Photo Enhancement'])
@@ -119,7 +120,7 @@ if uploaded_file is not None:
             # Apply automatic photo enhancement
             image = np.array(image)
             enhanced_image = auto_enhance(image)
-            st.image(enhanced_image, width=300,clamp = True)
+            st.image(enhanced_image, width=img_width,clamp = True)
             # Add download button
             if st.button('Download Image'):
                 with st.spinner('Downloading...'):
@@ -142,7 +143,7 @@ if uploaded_file is not None:
         #             cv2.rectangle(img_rgb, (x, y),  
         #                         (x + height, y + width),  
         #                         (0, 255, 0), 5) 
-        #     st.image(img_rgb, width=300,clamp = True)
+        #     st.image(img_rgb, width=img_width,clamp = True)
 
         elif filter == 'Face Detection and Recognition':
             face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
@@ -154,12 +155,12 @@ if uploaded_file is not None:
                 cv2.rectangle(image, (x, y), (x+w, y+h), (255, 0, 0), 2)
 
             img = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-            st.image(img, width=300)
+            st.image(img, width=img_width)
 
         elif filter == 'Gray Image':
             converted_img = np.array(image.convert('RGB'))
             gray_scale = cv2.cvtColor(converted_img, cv2.COLOR_RGB2GRAY)
-            st.image(gray_scale, width=300)
+            st.image(gray_scale, width=img_width)
             # Add download button
             if st.button('Download Image'):
                 with st.spinner('Downloading...'):
@@ -171,7 +172,7 @@ if uploaded_file is not None:
             gray_scale = cv2.cvtColor(converted_img, cv2.COLOR_RGB2GRAY)
             slider = st.sidebar.slider('Adjust the intensity', 1, 255, 127, step=1)
             (thresh, blackAndWhiteImage) = cv2.threshold(gray_scale, slider, 255, cv2.THRESH_BINARY)
-            st.image(blackAndWhiteImage, width=300)
+            st.image(blackAndWhiteImage, width=img_width)
             # Add download button
             if st.button('Download Image'):
                 with st.spinner('Downloading...'):
@@ -185,7 +186,7 @@ if uploaded_file is not None:
             slider = st.sidebar.slider('Adjust the intensity', 25, 255, 125, step=2)
             blur_image = cv2.GaussianBlur(inv_gray, (slider, slider), 0, 0)
             sketch = cv2.divide(gray_scale, 255 - blur_image, scale=256)
-            st.image(sketch, width=300)
+            st.image(sketch, width=img_width)
             # Add download button
             if st.button('Download Image'):
                 with st.spinner('Downloading...'):
@@ -197,7 +198,7 @@ if uploaded_file is not None:
             slider = st.sidebar.slider('Adjust the intensity', 5, 81, 33, step=2)
             converted_img = cv2.cvtColor(converted_img, cv2.COLOR_RGB2BGR)
             blur_image = cv2.GaussianBlur(converted_img, (slider,slider), 0, 0)
-            st.image(blur_image, channels='BGR', width=300)
+            st.image(blur_image, channels='BGR', width=img_width)
             # Add download button
             if st.button('Download Image'):
                 with st.spinner('Downloading...'):
@@ -207,7 +208,7 @@ if uploaded_file is not None:
         elif filter == 'Rotate':
             degrees = st.sidebar.slider('Rotate the image by how many degrees?', -180, 180, 0, 1)
             rotated_image = image.rotate(degrees)
-            st.image(rotated_image, width=300)
+            st.image(rotated_image, width=img_width)
             # Add download button
             if st.button('Download Image'):
                 with st.spinner('Downloading...'):
@@ -220,7 +221,7 @@ if uploaded_file is not None:
                 flipped_image = image.transpose(Image.FLIP_LEFT_RIGHT)
             else:
                 flipped_image = image.transpose(Image.FLIP_TOP_BOTTOM)
-            st.image(flipped_image, width=300)
+            st.image(flipped_image, width=img_width)
             # Add download button
             if st.button('Download Image'):
                 with st.spinner('Downloading...'):
@@ -231,7 +232,7 @@ if uploaded_file is not None:
             width = st.sidebar.slider('New width:', 1, 1000, image.size[0], 1)
             height = st.sidebar.slider('New height:', 1, 1000, image.size[1], 1)
             resized_image = image.resize((width, height))
-            st.image(resized_image, width=300)
+            st.image(resized_image, width=img_width)
             # Add download button
             if st.button('Download Image'):
                 with st.spinner('Downloading...'):
@@ -244,7 +245,7 @@ if uploaded_file is not None:
             right = st.sidebar.slider('Right edge:', left, image.size[0], image.size[0], 1)
             bottom = st.sidebar.slider('Bottom edge:', top, image.size[1], image.size[1], 1)
             cropped_image = image.crop((left, top, right, bottom))
-            st.image(cropped_image, width=300)
+            st.image(cropped_image, width=img_width)
             # Add download button
             if st.button('Download Image'):
                 with st.spinner('Downloading...'):
@@ -257,7 +258,7 @@ if uploaded_file is not None:
             low_threshold = st.sidebar.slider('Low threshold', 0, 255, 50)
             high_threshold = st.sidebar.slider('High threshold', 0, 255, 150)
             edges = cv2.Canny(gray_scale, low_threshold, high_threshold)
-            st.image(edges, width=300)
+            st.image(edges, width=img_width)
             # Add download button
             if st.button('Download Image'):
                 with st.spinner('Downloading...'):
@@ -269,7 +270,7 @@ if uploaded_file is not None:
             brightness_factor = st.sidebar.slider('Brightness factor', 0.1, 3.0, 1.0, step=0.1)
             enhancer = ImageEnhance.Brightness(Image.fromarray(converted_img))
             brightened_img = np.array(enhancer.enhance(brightness_factor))
-            st.image(brightened_img, width=300)
+            st.image(brightened_img, width=img_width)
             # Add download button
             if st.button('Download Image'):
                 with st.spinner('Downloading...'):
@@ -281,7 +282,7 @@ if uploaded_file is not None:
             contrast_factor = st.sidebar.slider('Contrast factor', 0.1, 3.0, 1.0, step=0.1)
             enhancer = ImageEnhance.Contrast(Image.fromarray(converted_img))
             contrasted_img = np.array(enhancer.enhance(contrast_factor))
-            st.image(contrasted_img, width=300)
+            st.image(contrasted_img, width=img_width)
             # Add download button
             if st.button('Download Image'):
                 with st.spinner('Downloading...'):
@@ -293,7 +294,7 @@ if uploaded_file is not None:
             saturation_factor = st.sidebar.slider('Saturation factor', 0.1, 3.0, 1.0, step=0.1)
             enhancer = ImageEnhance.Color(Image.fromarray(converted_img))
             saturated_img = np.array(enhancer.enhance(saturation_factor))
-            st.image(saturated_img, width=300)
+            st.image(saturated_img, width=img_width)
             # Add download button
             if st.button('Download Image'):
                 with st.spinner('Downloading...'):
@@ -329,7 +330,7 @@ if uploaded_file is not None:
                 if sticker_resize:
                     sticker = sticker.resize((int(sticker.size[0]*sticker_resize), int(sticker.size[1]*sticker_resize)))
                 img.paste(sticker,sticker_position, sticker)
-            st.image(img, width=300)
+            st.image(img, width=img_width)
             # Add download button
             if st.button('Download Image'):
                 with st.spinner('Downloading...'):
@@ -337,6 +338,6 @@ if uploaded_file is not None:
                     st.download_button(label='Download', data=img_io, file_name='image_with_text_sticker.png', mime='image/png')
 
         else: 
-            st.image(image, width=300) 
+            st.image(image, width=img_width) 
 
 
